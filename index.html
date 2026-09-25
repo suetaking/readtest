@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Словарь слов — EN/RU/KR/UZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">단어<span>장</span></div>
+  <div class="word-count" id="wordCountBadge">542 слов</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('cards',event)">🃏 Карточки</div>
+  <div class="tab" onclick="showTab('quiz',event)">🎯 Тест</div>
+  <div class="tab" onclick="showTab('list',event)">📚 Все слова</div>
+  <div class="tab" onclick="showTab('progress',event)">📊 Прогресс</div>
+</div>
+
+<!-- CARDS SCREEN -->
+<div class="screen active" id="screen-cards">
+  <div class="card-controls">
+    <button class="btn-small active" id="dir-en" onclick="setCardDir('en')">EN→</button>
+    <button class="btn-small" id="dir-ru" onclick="setCardDir('ru')">RU→</button>
+    <button class="btn-small" id="dir-kr" onclick="setCardDir('kr')">KR→</button>
+    <button class="btn-small" id="dir-uz" onclick="setCardDir('uz')">UZ→</button>
+    <button class="btn-small" onclick="shuffleCards()">🔀 Перемешать</button>
+    <button class="btn-small" onclick="resetProgress()">↺ Сбросить</button>
+  </div>
+
+  <div class="filter-bar" id="cards-level-filter">
+    <span class="level-badge A1" onclick="toggleLevel('A1',this)">A1</span>
+    <span class="level-badge A2" onclick="toggleLevel('A2',this)">A2</span>
+    <span class="level-badge B1" onclick="toggleLevel('B1',this)">B1</span>
+    <span class="level-badge B2" onclick="toggleLevel('B2',this)">B2</span>
+  </div>
+
+  <div class="toggle-row">
+    <label class="switch">
+      <input type="checkbox" id="only-unlearned" onchange="toggleOnlyUnlearned()">
+      <span class="switch-slider"></span>
+    </label>
+    <span>Показывать только невыученные слова</span>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-box"><div class="stat-num green" id="stat-know">0</div><div class="stat-label">Знаю</div></div>
+    <div class="stat-box"><div class="stat-num red" id="stat-dontknow">0</div><div class="stat-label">Учу</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-left">542</div><div class="stat-label">Осталось</div></div>
+  </div>
+
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-text" id="progress-text">Карточка 1 из 542</div>
+
+  <div class="flashcard-area">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="card-face card-front">
+        <button class="star-btn" id="star-btn-front" onclick="toggleFavoriteCurrent(event)">☆</button>
+        <button class="speak-btn" onclick="speakCurrent(event)">🔊</button>
+        <div class="card-lang-badge" id="card-front-lang">ENGLISH</div>
+        <div class="card-word" id="card-front-word">hello</div>
+        <div class="card-hint">👆 Нажми, чтобы увидеть перевод</div>
+      </div>
+      <div class="card-face card-back">
+        <button class="star-btn" id="star-btn-back" onclick="toggleFavoriteCurrent(event)">☆</button>
+        <div class="card-lang-badge" id="card-back-lang">РУССКИЙ / 한국어</div>
+        <div class="card-word" id="card-back-word1">привет</div>
+        <div class="card-sub" id="card-back-word2">안녕하세요</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-actions" id="card-actions" style="display:none">
+    <button class="btn-know btn-know-no" onclick="markCard(false)">✗ Не знаю</button>
+    <button class="btn-know btn-know-yes" onclick="markCard(true)">✓ Знаю</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn-nav" onclick="prevCard()">← Назад</button>
+    <button class="btn-nav" onclick="nextCard()">Вперёд →</button>
+  </div>
+  <div class="kbd-hint">Клавиши: <kbd>←</kbd> <kbd>→</kbd> навигация · <kbd>Пробел</kbd> перевернуть · <kbd>1</kbd> не знаю · <kbd>2</kbd> знаю</div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-header">
+    <button class="btn-small active" id="q-dir1" onclick="setQuizDir('en-ru')">EN→RU</button>
+    <button class="btn-small" id="q-dir2" onclick="setQuizDir('ru-en')">RU→EN</button>
+    <button class="btn-small" id="q-dir3" onclick="setQuizDir('kr-en')">KR→EN</button>
+    <button class="btn-small" id="q-dir4" onclick="setQuizDir('uz-en')">UZ→EN</button>
+    <button class="btn-small" id="q-dir5" onclick="setQuizDir('en-uz')">EN→UZ</button>
+    <button class="btn-small" id="q-dir6" onclick="setQuizDir('ru-uz')">RU→UZ</button>
+    <button class="btn-small" id="q-dir7" onclick="setQuizDir('uz-ru')">UZ→RU</button>
+    <button class="btn-small" onclick="startQuiz()">🔀 Новый раунд</button>
+  </div>
+
+  <div class="filter-bar" id="quiz-level-filter">
+    <span class="level-badge A1" onclick="toggleLevel('A1',this)">A1</span>
+    <span class="level-badge A2" onclick="toggleLevel('A2',this)">A2</span>
+    <span class="level-badge B1" onclick="toggleLevel('B1',this)">B1</span>
+    <span class="level-badge B2" onclick="toggleLevel('B2',this)">B2</span>
+  </div>
+
+  <div class="toggle-row">
+    <label class="switch">
+      <input type="checkbox" id="smart-quiz" checked onchange="toggleSmartQuiz()">
+      <span class="switch-slider"></span>
+    </label>
+    <span>Умный режим — чаще спрашивать слова, которые вы ещё учите</span>
+  </div>
+
+  <div class="quiz-score">
+    <div class="score-box" style="color:var(--green)">✓ <span id="quiz-correct">0</span></div>
+    <div class="score-box" style="color:var(--accent)">✗ <span id="quiz-wrong">0</span></div>
+    <div class="score-box" style="color:var(--muted)">📝 <span id="quiz-total">0</span></div>
+  </div>
+
+  <div class="quiz-question-box" style="position:relative">
+    <button class="speak-btn" onclick="speakQuizQuestion(event)">🔊</button>
+    <div class="quiz-question-lang" id="quiz-q-lang">ENGLISH</div>
+    <div class="quiz-question-word" id="quiz-q-word">—</div>
+  </div>
+
+  <div class="quiz-options" id="quiz-options"></div>
+</div>
+
+<!-- LIST SCREEN -->
+<div class="screen" id="screen-list">
+  <input class="search-box" type="text" placeholder="🔍 Поиск..." oninput="filterWords(this.value)" id="search-input">
+  <div class="filter-bar">
+    <span class="level-badge A1" onclick="toggleLevel('A1',this)">A1 Базовый</span>
+    <span class="level-badge A2" onclick="toggleLevel('A2',this)">A2 Начальный</span>
+    <span class="level-badge B1" onclick="toggleLevel('B1',this)">B1 Средний</span>
+    <span class="level-badge B2" onclick="toggleLevel('B2',this)">B2 Выше среднего</span>
+  </div>
+  <div class="status-filter" id="status-filter">
+    <button class="btn-small active" onclick="setStatusFilter('all',this)">Все</button>
+    <button class="btn-small" onclick="setStatusFilter('known',this)">✓ Знаю</button>
+    <button class="btn-small" onclick="setStatusFilter('dontknow',this)">✗ Учу</button>
+    <button class="btn-small" onclick="setStatusFilter('star',this)">⭐ Избранное</button>
+    <button class="btn-small" onclick="setStatusFilter('new',this)">Новые</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:4px;padding:6px 0;font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1px">
+    <span>ENGLISH</span><span>РУССКИЙ</span><span>한국어</span><span>O'ZBEK</span><span></span>
+  </div>
+  <div class="word-table" id="word-table"></div>
+</div>
+
+<!-- PROGRESS SCREEN -->
+<div class="screen" id="screen-progress">
+  <div class="big-stat-grid">
+    <div class="big-stat"><div class="big-stat-num green" id="prog-known">0</div><div class="big-stat-label">Слов выучено</div></div>
+    <div class="big-stat"><div class="big-stat-num red" id="prog-learning">0</div><div class="big-stat-label">В процессе</div></div>
+    <div class="big-stat"><div class="big-stat-num" id="prog-total-pct">0%</div><div class="big-stat-label">Прогресс по базе</div></div>
+    <div class="big-stat"><div class="big-stat-num" id="prog-quiz-acc">—</div><div class="big-stat-label">Точность в тесте</div></div>
+  </div>
+
+  <div class="section-title">По уровням</div>
+  <div id="level-progress-list"></div>
+
+  <div class="section-title">Данные</div>
+  <div class="data-actions">
+    <button class="btn-nav" onclick="exportProgress()">💾 Экспорт прогресса</button>
+    <button class="btn-nav" onclick="document.getElementById('import-file').click()">📂 Импорт прогресса</button>
+  </div>
+  <input type="file" id="import-file" accept="application/json" style="display:none" onchange="importProgress(event)">
+  <div class="nav-row">
+    <button class="btn-nav" style="border-color:var(--accent);color:var(--accent)" onclick="resetAllProgress()">🗑 Сбросить весь прогресс</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
